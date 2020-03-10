@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 class ConcertController extends Controller
 {
    public function show($id){
-       $concert = Concert::find($id);
+       $concert = Concert::published()->findOrFail($id);
        return view('Concerts.show', [
            'concert' => $concert
        ]);
