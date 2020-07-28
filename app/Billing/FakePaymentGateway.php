@@ -6,7 +6,6 @@ class FakePaymentGateway implements PaymentGateway
 {
     protected $charges;
 
-
     public function __construct()
     {
         $this->charges = collect();

@@ -17,7 +17,7 @@ class PurchaseTicketsTest extends TestCase
      *
      * @return void
      */
-    public function test_user_can_purchaseTickets()
+    public function test_user_can_purchase_tickets()
     {
         $paymentGateway = new FakePaymentGateway();
 
@@ -38,6 +38,6 @@ class PurchaseTicketsTest extends TestCase
         }));
 
         $order = $concert->orders->where('email', 'abdo@email.com')->first();
-        $this->assertEquals(3, $order->tickets->count());
+        $this->assertEquals(5, $order->tickets()->count());
     }
 }
