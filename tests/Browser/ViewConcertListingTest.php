@@ -8,6 +8,7 @@ use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Dusk\Browser;
 use Tests\DuskTestCase;
+use Throwable;
 
 class ViewConcertListingTest extends DuskTestCase
 {
@@ -15,7 +16,7 @@ class ViewConcertListingTest extends DuskTestCase
     /**
      * @test
      * @return void
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function user_can_view_a_published_concert_listing()
     {
@@ -46,10 +47,11 @@ class ViewConcertListingTest extends DuskTestCase
                 ->assertSee('For tickets, call (555) 555-5555');
         });
     }
+
     /**
      * @test
      * @return void
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function user_cannot_view_unpublished_concert(){
         $concert = factory(Concert::class)->states('unpublished')->create();
