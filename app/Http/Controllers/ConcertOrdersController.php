@@ -16,14 +16,14 @@ class ConcertOrdersController extends Controller
 
     public function store($concertId){
         $concert = Concert::find($concertId);
+
+        // Charging the customer
         $ticket_quantity = request('ticket_quantity');
         $amount = $ticket_quantity * $concert->ticket_price;
-        $token = request('payment_token');
-        $this->paymentGateway->charge($amount, $token);
-        $order = $concert->orders()->create(['email'=>request('email')]);
-        foreach (range(1, $ticket_quantity) as $i){
-            $order->tickets()->create([]);
-        }
+        $this->paymentGateway->charge($amount, request('payment_token'));
+
+        // creating the order
+        $concert->orderTickets(request('email'), $ticket_quantity);
         return response()->json([], 201);
     }
 }
