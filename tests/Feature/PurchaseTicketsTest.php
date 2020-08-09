@@ -42,6 +42,8 @@ class PurchaseTicketsTest extends TestCase
     public function test_user_can_purchase_tickets()
     {
         $concert = factory(Concert::class)->state('published')->create(['ticket_price' => 2000]);
+        $concert->addTickets(5);
+
         $response = $this->orderTicketsRequest($concert, [
             'email' => 'abdo@email.com',
             'ticket_quantity' => 5,
@@ -62,6 +64,8 @@ class PurchaseTicketsTest extends TestCase
     public function test_user_cannot_purchase_an_unpublished_concerts()
     {
         $concert = factory(Concert::class)->state('unpublished')->create();
+        $concert->addTickets(5);
+
         $response = $this->orderTicketsRequest($concert, [
             'email' => 'abdo@email.com',
             'ticket_quantity' => 5,
@@ -73,11 +77,33 @@ class PurchaseTicketsTest extends TestCase
         $this->assertEquals(0, $this->paymentGateway->totalCharges());
     }
 
-    public function test_order_not_created_if_invalid_token()
+    public function test_user_cannot_purchase_more_tickets_than_remains()
     {
         $this->withoutExceptionHandling();
 
+        $concert = factory(Concert::class)->state('published')->create();
+        $concert->addTickets(50);
+
+        $response = $this->orderTicketsRequest($concert, [
+            'email' => 'abdo@email.com',
+            'ticket_quantity' => 51,
+            'payment_token' => $this->paymentGateway->getValidToken()
+        ]);
+
+        $response->assertStatus(422);
+        $order = $concert->orders->where('email', 'abdo@email.com')->first();
+        $this->assertNull($order);
+        $this->assertEquals(0, $concert->orders()->count());
+        $this->assertEquals(0, $this->paymentGateway->totalCharges());
+        $this->assertEquals(50, $concert->ticketsRemaining());
+    }
+
+    public function test_order_not_created_if_invalid_token()
+    {
+//        $this->withoutExceptionHandling();
         $concert = factory(Concert::class)->state('published')->create(['ticket_price' => 2000]);
+        $concert->addTickets(5);
+
         $response = $this->orderTicketsRequest($concert, [
             'email' => 'abdo@email.com',
             'ticket_quantity' => 5,

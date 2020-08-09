@@ -12,4 +12,12 @@ class Order extends Model
     {
         return $this->hasMany(Ticket::Class);
     }
+
+    public function cancel()
+    {
+        foreach ($this->tickets as $ticket){
+            $ticket->release();
+        }
+        $this->delete();
+    }
 }
